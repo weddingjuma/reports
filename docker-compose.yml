@@ -1,0 +1,37 @@
+version: '1'
+
+services:
+	postgres:
+		image: postgres:9.6
+		container_name: postgres
+		environment:
+			POSTGRES_USER: reports
+			POSTGRES_PASSWORD: J5brHrAXFLQSif0K
+			POSTGRES_DB: reports
+
+	reports:
+		build: .
+		image: chamaconekt/reports
+		links:
+		- postgres
+		container_name: reports
+		depends_on:
+			- reports
+		environment:
+
+	nginx:
+		image: nginx:1.11.11-alpine
+		links:
+			- reports
+		container_name: nginx
+		command: nginx -g 'daemon off;' -c /etc/reports-nginx/nginx.conf
+		depends_on:
+			- reports
+		ports:
+			- 80:80
+		volumes_from:
+			- reports
+
+volumes:
+	reports-static-files:
+		driver:local
